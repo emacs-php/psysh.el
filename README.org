@@ -1,0 +1,7 @@
+* PsySH.el
+
+[[http://psysh.org/][PsySH]], PHP interactive shell (REPL)
+
+** Setup
+
+See http://psysh.org/
