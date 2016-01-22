@@ -39,7 +39,7 @@
 (defun psysh ()
   "Run PsySH interactive shell."
   (interactive)
-  (display-buffer (make-comint "PsySH" "psysh")))
+  (switch-to-buffer (make-comint "PsySH" "psysh")))
 
 (provide 'psysh)
 ;;; psysh.el ends here
