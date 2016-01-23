@@ -34,12 +34,26 @@
 ;; $ composer g require psy/psysh:@stable
 
 ;;; Code:
+(require 'comint)
+
+(defvar psysh-mode-map
+  (let ((map (make-sparse-keymap)))
+    map))
+
+(define-derived-mode psysh-mode comint-mode "PsySH"
+  "Major-mode for PsySH REPL."
+  (setq-local comint-process-echoes t))
+
+(defun psysh--make-process (name program)
+  "Make a Comint process NAME in BUFFER, running PROGRAM."
+  (apply 'make-comint name program '()))
 
 ;;;###autoload
 (defun psysh ()
   "Run PsySH interactive shell."
   (interactive)
-  (switch-to-buffer (make-comint "PsySH" "psysh")))
+  (switch-to-buffer (psysh--make-process "PsySH" "psysh"))
+  (psysh-mode))
 
 (provide 'psysh)
 ;;; psysh.el ends here
