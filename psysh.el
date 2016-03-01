@@ -38,21 +38,32 @@
 
 (defvar psysh-mode-map
   (let ((map (make-sparse-keymap)))
+    ;;
     map))
 
 (define-derived-mode psysh-mode comint-mode "PsySH"
   "Major-mode for PsySH REPL."
   (setq-local comint-process-echoes t))
 
-(defun psysh--make-process (name program)
+(defun psysh--detect-buffer ()
+  "Return tuple list, comint buffer name and program."
+  '("PsySH" "psysh"))
+
+(defun psysh--make-process ()
   "Make a Comint process NAME in BUFFER, running PROGRAM."
-  (apply 'make-comint name program '()))
+  (apply 'make-comint (psysh--detect-buffer)))
+
+(defun psysh-eval-region (begin end)
+  "Evalute PHP code BEGIN to END."
+  (interactive "r")
+  (let ((buf (psysh--make-process)))
+    (comint-send-region buf begin end)))
 
 ;;;###autoload
 (defun psysh ()
   "Run PsySH interactive shell."
   (interactive)
-  (switch-to-buffer (psysh--make-process "PsySH" "psysh"))
+  (switch-to-buffer (psysh--make-process))
   (psysh-mode))
 
 (provide 'psysh)
