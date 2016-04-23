@@ -1,5 +1,9 @@
 * PsySH.el
 
+#+BEGIN_HTML
+<a href="https://melpa.org/#/psysh"><img src="https://melpa.org/packages/psysh-badge.svg" alt="MELPA"></a>
+#+END_HTML
+
 [[http://psysh.org/][PsySH]], PHP interactive shell (REPL)
 
 ** Setup

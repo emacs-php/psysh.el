@@ -4,6 +4,7 @@
 
 ;; Author: USAMI Kenta <tadsan@zonu.me>
 ;; Keywords: process, php
+;; URL: https://github.com/zonuexe/psysh.el
 
 ;; This file is NOT part of GNU Emacs.
 
