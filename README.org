@@ -5,3 +5,10 @@
 ** Setup
 
 See http://psysh.org/
+
+** Compatibility
+
+- [[https://github.com/ejmr/php-mode][php-mode]]
+- [[http://auto-complete.org/][auto-complete]]
+- [[https://github.com/sabof/php-eldoc][php-eldoc]]
+
