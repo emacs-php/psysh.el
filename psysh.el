@@ -53,6 +53,32 @@
   "Make a Comint process NAME in BUFFER, running PROGRAM."
   (apply 'make-comint (psysh--detect-buffer)))
 
+(defun psysh--copy-variables-from-php-mode ()
+  "Set ac-sources from php-mode."
+  (when (fboundp 'php-mode)
+    (let ((current-major-mode major-mode)
+          (php-mode-ac-sources nil))
+
+      (php-mode)
+
+      (when (boundp 'psysh-enable-eldoc)
+        (setq psysh-enable-eldoc (and (boundp 'eldoc-mode) eldoc-mode)))
+
+      (if (and (boundp 'auto-complete-mode)
+               auto-complete-mode
+               (boundp 'ac-sources))
+          (progn
+            (setq php-mode-ac-sources ac-sources)
+            (funcall current-major-mode)
+            (setq ac-sources (append ac-sources php-mode-ac-sources)))
+        (funcall current-major-mode)))))
+
+(defun psysh--enable-eldoc ()
+  "Turn on php-eldoc."
+  (when (fboundp 'php-eldoc-enable)
+    (php-eldoc-enable)
+    (eldoc-mode 1)))
+
 (defun psysh-eval-region (begin end)
   "Evalute PHP code BEGIN to END."
   (interactive "r")
@@ -64,6 +90,13 @@
   "Run PsySH interactive shell."
   (interactive)
   (switch-to-buffer (psysh--make-process))
+
+  (make-local-variable 'psysh-enable-eldoc)
+  (psysh--copy-variables-from-php-mode)
+
+  (when (and (boundp 'psysh-enable-eldoc) psysh-enable-eldoc)
+    (add-hook 'psysh-mode-hook #'psysh--enable-eldoc))
+
   (psysh-mode))
 
 (provide 'psysh)
