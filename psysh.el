@@ -59,20 +59,20 @@
   (when (fboundp 'php-mode)
     (let ((current-major-mode major-mode)
           (php-mode-ac-sources nil))
+      (with-temp-buffer
+        (php-mode)
 
-      (php-mode)
+        (when (boundp 'psysh-enable-eldoc)
+          (setq psysh-enable-eldoc (and (boundp 'eldoc-mode) eldoc-mode)))
 
-      (when (boundp 'psysh-enable-eldoc)
-        (setq psysh-enable-eldoc (and (boundp 'eldoc-mode) eldoc-mode)))
-
-      (if (and (boundp 'auto-complete-mode)
-               auto-complete-mode
-               (boundp 'ac-sources))
-          (progn
-            (setq php-mode-ac-sources ac-sources)
-            (funcall current-major-mode)
-            (setq ac-sources (append ac-sources php-mode-ac-sources)))
-        (funcall current-major-mode)))))
+        (if (and (boundp 'auto-complete-mode)
+                 auto-complete-mode
+                 (boundp 'ac-sources))
+            (progn
+              (setq php-mode-ac-sources ac-sources)
+              (funcall current-major-mode)
+              (setq ac-sources (append ac-sources php-mode-ac-sources)))
+          (funcall current-major-mode))))))
 
 (defun psysh--enable-eldoc ()
   "Turn on php-eldoc."
@@ -92,7 +92,7 @@
   (interactive)
   (switch-to-buffer (psysh--make-process))
 
-  (make-local-variable 'psysh-enable-eldoc)
+  (set (make-local-variable 'psysh-enable-eldoc) nil)
   (psysh--copy-variables-from-php-mode)
 
   (when (and (boundp 'psysh-enable-eldoc) psysh-enable-eldoc)
