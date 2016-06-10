@@ -46,9 +46,18 @@
   "Major-mode for PsySH REPL."
   (setq-local comint-process-echoes t))
 
+(defvar psysh-comint-buffer-process
+  nil
+  "A list (buffer-name process) is arguments for `make-comint'.")
+(make-variable-buffer-local 'psysh-comint-buffer-process)
+
+(defvar psysh-mode-hook nil
+  "List of functions to be executed on entry to `psysh-mode'.")
+
 (defun psysh--detect-buffer ()
   "Return tuple list, comint buffer name and program."
-  '("PsySH" "psysh"))
+  (or psysh-comint-buffer-process
+      '("psysh" "psysh")))
 
 (defun psysh--make-process ()
   "Make a Comint process NAME in BUFFER, running PROGRAM."
@@ -86,6 +95,13 @@
   (let ((buf (psysh--make-process)))
     (comint-send-region buf begin end)))
 
+(defun psysh-restart ()
+  "Restart PsySH process."
+  (interactive)
+  (when (eq major-mode 'psysh-mode)
+    (delete-process (get-buffer-process (current-buffer)))
+    (psysh)))
+
 ;;;###autoload
 (defun psysh ()
   "Run PsySH interactive shell."
@@ -98,7 +114,15 @@
   (when (and (boundp 'psysh-enable-eldoc) psysh-enable-eldoc)
     (add-hook 'psysh-mode-hook #'psysh--enable-eldoc))
 
-  (psysh-mode))
+  (psysh-mode)
+  (run-hooks 'psysh-mode-hook))
+(put 'psysh 'interactive-only 'psysh-run)
+
+;;;###autoload
+(defun psysh-run (buffer-name process)
+  "Run PsySH interactive-shell in `BUFFER-NAME' and `PROCESS'."
+  (let ((psysh-comint-buffer-process (list buffer-name process)))
+    (call-interactively 'psysh)))
 
 (provide 'psysh)
 ;;; psysh.el ends here
