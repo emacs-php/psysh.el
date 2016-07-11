@@ -6,13 +6,63 @@
 
 [[http://psysh.org/][PsySH]], PHP interactive shell (REPL)
 
-** Setup
-
-See http://psysh.org/
-
 ** Compatibility
 
 - [[https://github.com/ejmr/php-mode][php-mode]]
 - [[http://auto-complete.org/][auto-complete]]
 - [[https://github.com/sabof/php-eldoc][php-eldoc]]
 
+** Installation
+*** A: The easy way
+#+BEGIN_SRC
+$ wget psysh.org/psysh
+$ chmod +x psysh
+#+END_SRC
+
+And copy or make symlink to your =$PATH= dir.
+
+*** B: The other easy way
+
+Get Composer.  See https://getcomposer.org/download/
+
+#+BEGIN_SRC
+$ composer g require psy/psysh:@stable
+#+END_SRC
+
+*** C: Project local REPL
+
+Set =psysh-comint-buffer-process= (buffer local variable).
+
+#+BEGIN_SRC emacs-lisp
+(setq psysh-comint-buffer-process "path/to/shell.php")
+#+END_SRC
+
+=shell.php= is for example:
+
+#+BEGIN_SRC php
+#!/usr/bin/env php
+<?php
+// ↓Namespace for your project
+namespace Nyaan;
+
+// load Composer autoload file
+require_once __DIR__ . '/vendor/autoload.php';
+// load other initialize PHP files
+// require_once …
+
+echo __NAMESPACE__ . " shell\n";
+
+$sh = new \Psy\Shell();
+
+// Set project namespace in REPL
+if (defined('__NAMESPACE__') && __NAMESPACE__ !== '') {
+    $sh->addCode(sprintf("namespace %s;", __NAMESPACE__));
+}
+
+$sh->run();
+
+// Termination message
+echo "Bye.\n";
+#+END_SRC
+
+See also http://cho-phper.hateblo.jp/entry/2015/11/10/031000 *(Japanese)*
