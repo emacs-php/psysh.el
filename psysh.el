@@ -3,7 +3,7 @@
 ;; Copyright (C) 2016 USAMI Kenta
 
 ;; Author: USAMI Kenta <tadsan@zonu.me>
-;; Keywords: process, php
+;; Keywords: processes php
 ;; URL: https://github.com/zonuexe/psysh.el
 
 ;; This file is NOT part of GNU Emacs.
