@@ -81,6 +81,14 @@
 ;;; Code:
 (require 'comint)
 
+
+(defgroup psysh nil
+  "PsySH"
+  :tag "PsySH"
+  :group 'php
+  :group 'tools)
+
+;; PsySH REPL Mode functions
 (defvar psysh-mode-map
   (let ((map (make-sparse-keymap)))
     ;;
@@ -97,6 +105,8 @@
 
 (defvar psysh-mode-hook nil
   "List of functions to be executed on entry to `psysh-mode'.")
+
+(defconst psysh--re-prompt "^>>> ")
 
 (defun psysh--detect-buffer ()
   "Return tuple list, comint buffer name and program."
@@ -145,6 +155,75 @@
   (when (eq major-mode 'psysh-mode)
     (delete-process (get-buffer-process (current-buffer)))
     (psysh)))
+
+
+;; PsySH Doc Mode functions
+(defvar psysh-doc-buffer-name "*psysh doc*")
+
+(defcustom psysh-doc-buffer-color 'auto
+  "Coloring PsySH buffer."
+  :type '(choice (const :tag "Auto detect color mode." 'auto)
+                 (const :tag "Use only PsySH original coloring." 'only-psysh)
+                 (const :tag "Use only Emacs font-lock coloring." 'only-emacs)
+                 (const :tag "Use multiple coloring mechanism." 'mixed)
+                 (const :tag "No coloring." 'none)))
+
+(defcustom psysh-doc-display-function #'view-buffer-other-window
+  "Function to display PsySH doc buffer."
+  :type '(function))
+
+;;;###autoload
+(defun psysh-doc-buffer (target &optional buf)
+  "Execute PsySH Doc `TARGET' and Return PsySH buffer `BUF'."
+  (if (null buf) (setq buf (get-buffer-create psysh-doc-buffer-name)))
+  (with-current-buffer buf
+    (read-only-mode -1)
+    (erase-buffer)
+    (insert "doc " target)
+    (message "%s %s" (nth 1 (psysh--detect-buffer)) (buffer-substring (point-min) (point-max)))
+    (apply 'call-process-region (point-min) (point-max) (nth 1 (psysh--detect-buffer)) t t nil
+           (if (memq psysh-doc-buffer-color '(none only-emacs))
+               '("--no-color")
+             '("--color")))
+    (unless (memq psysh-doc-buffer-color '(none only-emacs))
+      (ansi-color-apply-on-region (point-min) (point-max)))
+    (goto-char (point-min))
+    (when (search-forward-regexp psysh--re-prompt)
+      (delete-region (point-min) (match-beginning 0)))
+    (goto-char (point-max))
+    (when (search-backward-regexp (concat psysh--re-prompt "$"))
+      (delete-region (match-beginning 0) (point-max)))
+    (goto-char (point-min))
+    (unless (eq major-mode 'psysh-doc-mode)
+      (psysh-doc-mode)))
+  buf)
+
+;;;###autoload
+(define-derived-mode psysh-doc-mode prog-mode "PsySH-doc"
+  "Major mode for viewing PsySH Doc."
+  (setq show-trailing-whitespace nil)
+  (read-only-mode +1))
+
+;;;###autoload
+(defun psysh-doc-string (target)
+  "Return string of PsySH Doc `TARGET'."
+  (let ((psysh-doc-buffer-color nil))
+    (with-current-buffer (psysh-doc-buffer target (current-buffer))
+      (buffer-substring-no-properties (point-min) (point-max)))))
+
+;;;###autoload
+(defun psysh-doc (target)
+  "Display PsySH doc `TARGET'."
+  (interactive
+   (list (read-string
+          "Input class or function name: "
+          (if (region-active-p)
+              (buffer-substring-no-properties (region-beginning) (region-end))
+            ""))))
+  (funcall psysh-doc-display-function (psysh-doc-buffer target)))
+
+
+;; PsySH Command
 
 ;;;###autoload
 (defun psysh ()
