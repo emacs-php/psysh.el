@@ -3,6 +3,9 @@
 ;; Copyright (C) 2016 USAMI Kenta
 
 ;; Author: USAMI Kenta <tadsan@zonu.me>
+;; Created: 22 Jan 2016
+;; Version: 0.0.3
+;; Package-Requires: ((emacs "24.3"))
 ;; Keywords: processes php
 ;; URL: https://github.com/zonuexe/psysh.el
 
