@@ -1,0 +1,8 @@
+{
+    "name": "zonuexe/psysh-el",
+    "description": "PsySH, PHP interactive shell (REPL)",
+    "license": "GPL-3.0",
+    "require": {
+        "psy/psysh": "^0.8.1"
+    }
+}
