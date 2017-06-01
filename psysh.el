@@ -94,8 +94,39 @@
     ;;
     map))
 
+(defvar psysh-mode-input-syntax-table
+  (let ((syntax-table (make-syntax-table)))
+    (c-populate-syntax-table syntax-table)
+    (modify-syntax-entry ?$ "_" syntax-table)
+    syntax-table)
+  "Syntax table used for the comint input.")
+
+(defvar psysh-mode-output-syntax-table
+  (let ((syntax-table (make-syntax-table comint-mode-syntax-table)))
+    (modify-syntax-entry ?' "." syntax-table)
+    (modify-syntax-entry ?\" "." syntax-table)
+    syntax-table)
+  "Syntax table used for the outpyt from psysh.
+
+Strings are turned into punctuation so that if they come
+unbalanced they will not break the rest of the buffer.")
+
+(defun psysh--output-filter-remove-syntax (&rest _ignore)
+  "Place the syntax-table property on the psysh output.
+
+See `psysh-mode-output-syntax-table'."
+  (put-text-property (or (point-min)
+                         (previous-single-property-change (point) 'field)) (point)
+                     'syntax-table psysh-mode-output-syntax-table))
+
 (define-derived-mode psysh-mode comint-mode "PsySH"
   "Major-mode for PsySH REPL."
+  :syntax-table psysh-mode-input-syntax-table
+  (when (featurep 'php-mode)
+    (set (make-local-variable 'font-lock-defaults)
+         '(php-font-lock-keywords nil nil)))
+  (set (make-local-variable 'parse-sexp-lookup-properties) t)
+  (add-hook 'comint-output-filter-functions 'psysh--output-filter-remove-syntax 'append 'local)
   (setq-local comint-process-echoes t))
 
 (defvar psysh-comint-buffer-process
