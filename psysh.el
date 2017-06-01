@@ -88,6 +88,7 @@
 (defgroup psysh nil
   "PsySH"
   :tag "PsySH"
+  :prefix "psysh-"
   :group 'php
   :group 'tools)
 
