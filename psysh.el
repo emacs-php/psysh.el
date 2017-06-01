@@ -5,7 +5,7 @@
 ;; Author: USAMI Kenta <tadsan@zonu.me>
 ;; Created: 22 Jan 2016
 ;; Version: 0.0.3
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.3") (s "1.9.0") (f "0.17"))
 ;; Keywords: processes php
 ;; URL: https://github.com/zonuexe/psysh.el
 
@@ -80,6 +80,9 @@
 
 ;;; Code:
 (require 'comint)
+(require 's)
+(require 'f)
+;; (require 'xdg) ; Emacs 25.3?
 
 
 (defgroup psysh nil
@@ -87,6 +90,9 @@
   :tag "PsySH"
   :group 'php
   :group 'tools)
+
+(defcustom psysh-history-file-path (f-join (psysh--config-dir-path) "psysh_history")
+  "Path to PsySH history file.")
 
 ;; PsySH REPL Mode functions
 (defvar psysh-mode-map
@@ -186,6 +192,19 @@ See `psysh-mode-output-syntax-table'."
   (when (eq major-mode 'psysh-mode)
     (delete-process (get-buffer-process (current-buffer)))
     (psysh)))
+
+
+;; Path utilities
+(defun psysh--config-dir-path ()
+  "Return path to PsySH config dir."
+  ;; TODO: maybe next version Emacs bundles xdg.el?
+  (if (eq system-type 'windows-nt)
+      (f-join (s-replace-all '(("\\" . "/"))
+                             (or (getenv "APPDATA")
+                                 (f-join (getenv "HOME") "AppData"))) "PsySH")
+    (f-join (or (getenv "XDG_CONFIG_HOME")
+                (f-join (getenv "HOME") ".config"))
+            "psysh")))
 
 
 ;; PsySH Doc Mode functions
