@@ -216,7 +216,7 @@ See `psysh-mode-output-syntax-table'."
             "psysh")))
 
 (defun psysh--load-history (path n)
-  "Load input histories by PATH and return N elements."
+  "Load input history from PATH and return N elements."
   (with-temp-buffer
     (insert-file-contents-literally path)
     (goto-char (point-max))
@@ -229,9 +229,9 @@ See `psysh-mode-output-syntax-table'."
                                                                       (point)))
               do (forward-line -1)))))
 
-(defun psysh--insertion-history-lines (histories)
-  "Insert history `HISTORIES' lines to comint-input-ring."
-  (cl-loop for line in histories
+(defun psysh--insertion-history-lines (history)
+  "Insert `HISTORY' lines to `comint-input-ring'."
+  (cl-loop for line in history
            unless (string= "" line)
            do (comint-add-to-input-history line)))
 
