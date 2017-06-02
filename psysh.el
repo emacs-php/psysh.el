@@ -5,7 +5,7 @@
 ;; Author: USAMI Kenta <tadsan@zonu.me>
 ;; Created: 22 Jan 2016
 ;; Version: 0.0.3
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.3") (s "1.9.0") (f "0.17"))
 ;; Keywords: processes php
 ;; URL: https://github.com/zonuexe/psysh.el
 
@@ -80,13 +80,23 @@
 
 ;;; Code:
 (require 'comint)
+(require 's)
+(require 'f)
+;; (require 'xdg) ; Emacs 25.3?
 
 
 (defgroup psysh nil
   "PsySH"
   :tag "PsySH"
+  :prefix "psysh-"
   :group 'php
   :group 'tools)
+
+(defcustom psysh-history-file-path (f-join (psysh--config-dir-path) "psysh_history")
+  "Path to PsySH history file.")
+
+(defcustom psysh-inherit-history t
+  "If non-nil, inherits PsySH input history.")
 
 ;; PsySH REPL Mode functions
 (defvar psysh-mode-map
@@ -127,7 +137,12 @@ See `psysh-mode-output-syntax-table'."
          '(php-font-lock-keywords nil nil)))
   (set (make-local-variable 'parse-sexp-lookup-properties) t)
   (add-hook 'comint-output-filter-functions 'psysh--output-filter-remove-syntax 'append 'local)
-  (setq-local comint-process-echoes t))
+  (setq-local comint-process-echoes t)
+
+  (when (and psysh-inherit-history psysh-history-file-path
+             (file-regular-p psysh-history-file-path))
+    (psysh--insertion-history-lines
+     (psysh--load-history psysh-history-file-path (ring-size comint-input-ring)))))
 
 (defvar psysh-comint-buffer-process
   nil
@@ -186,6 +201,39 @@ See `psysh-mode-output-syntax-table'."
   (when (eq major-mode 'psysh-mode)
     (delete-process (get-buffer-process (current-buffer)))
     (psysh)))
+
+
+;; History
+(defun psysh--config-dir-path ()
+  "Return path to PsySH config dir."
+  ;; TODO: maybe next version Emacs bundles xdg.el?
+  (if (eq system-type 'windows-nt)
+      (f-join (s-replace-all '(("\\" . "/"))
+                             (or (getenv "APPDATA")
+                                 (f-join (getenv "HOME") "AppData"))) "PsySH")
+    (f-join (or (getenv "XDG_CONFIG_HOME")
+                (f-join (getenv "HOME") ".config"))
+            "psysh")))
+
+(defun psysh--load-history (path n)
+  "Load input history from PATH and return N elements."
+  (with-temp-buffer
+    (insert-file-contents-literally path)
+    (goto-char (point-max))
+    (reverse
+     (cl-loop repeat n
+              do (beginning-of-line)
+              never (eq (point) (point-min))
+              collect (buffer-substring-no-properties (point)
+                                                      (save-excursion (end-of-line)
+                                                                      (point)))
+              do (forward-line -1)))))
+
+(defun psysh--insertion-history-lines (history)
+  "Insert `HISTORY' lines to `comint-input-ring'."
+  (cl-loop for line in history
+           unless (string= "" line)
+           do (comint-add-to-input-history line)))
 
 
 ;; PsySH Doc Mode functions
