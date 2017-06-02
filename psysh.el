@@ -92,11 +92,14 @@
   :group 'php
   :group 'tools)
 
-(defcustom psysh-history-file-path (f-join (psysh--config-dir-path) "psysh_history")
-  "Path to PsySH history file.")
+(defcustom psysh-history-file-path nil
+  "Path to PsySH history file."
+  :type '(choice (const  :tag "Use default path" nil)
+                 (string :tag "Path to history file")))
 
 (defcustom psysh-inherit-history t
-  "If non-nil, inherits PsySH input history.")
+  "If non-nil, inherits PsySH input history."
+  :type 'boolean)
 
 ;; PsySH REPL Mode functions
 (defvar psysh-mode-map
@@ -139,10 +142,10 @@ See `psysh-mode-output-syntax-table'."
   (add-hook 'comint-output-filter-functions 'psysh--output-filter-remove-syntax 'append 'local)
   (setq-local comint-process-echoes t)
 
-  (when (and psysh-inherit-history psysh-history-file-path
-             (file-regular-p psysh-history-file-path))
-    (psysh--insertion-history-lines
-     (psysh--load-history psysh-history-file-path (ring-size comint-input-ring)))))
+  (let ((history-path (or psysh-history-file-path (f-join (psysh--config-dir-path) "psysh_history"))))
+    (when (and psysh-inherit-history (file-regular-p history-path))
+      (psysh--insertion-history-lines
+       (psysh--load-history history-path (ring-size comint-input-ring))))))
 
 (defvar psysh-comint-buffer-process
   nil
