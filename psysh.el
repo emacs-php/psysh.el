@@ -79,6 +79,7 @@
 ;;
 
 ;;; Code:
+(require 'cc-mode)
 (require 'comint)
 (require 's)
 (require 'f)
