@@ -81,6 +81,7 @@
 ;;; Code:
 (require 'cc-mode)
 (require 'comint)
+(require 'thingatpt)
 (require 's)
 (require 'f)
 ;; (require 'xdg) ; Emacs 25.3?
@@ -302,7 +303,7 @@ See `psysh-mode-output-syntax-table'."
           "Input class or function name: "
           (if (region-active-p)
               (buffer-substring-no-properties (region-beginning) (region-end))
-            ""))))
+            (thing-at-point 'symbol)))))
   (funcall psysh-doc-display-function (psysh-doc-buffer target)))
 
 
