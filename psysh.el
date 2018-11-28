@@ -22,7 +22,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -75,7 +75,7 @@
 ;;     // Termination message
 ;;     echo "Bye.\n";
 ;;
-;; See also http://cho-phper.hateblo.jp/entry/2015/11/10/031000 *(Japanese)*
+;; See also https://cho-phper.hateblo.jp/entry/2015/11/10/031000 *(Japanese)*
 ;;
 
 ;;; Code:
