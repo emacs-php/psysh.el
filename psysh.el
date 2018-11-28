@@ -1,6 +1,6 @@
 ;;; psysh.el --- PsySH, PHP interactive shell (REPL) -*- lexical-binding: t -*-
 
-;; Copyright (C) 2016 USAMI Kenta
+;; Copyright (C) 2018  Friends of Emacs-PHP development
 
 ;; Author: USAMI Kenta <tadsan@zonu.me>
 ;; Created: 22 Jan 2016
