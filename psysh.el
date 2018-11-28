@@ -4,7 +4,7 @@
 
 ;; Author: USAMI Kenta <tadsan@zonu.me>
 ;; Created: 22 Jan 2016
-;; Version: 0.0.3
+;; Version: 0.0.5
 ;; Package-Requires: ((emacs "24.3") (s "1.9.0") (f "0.17"))
 ;; Keywords: processes php
 ;; URL: https://github.com/zonuexe/psysh.el
