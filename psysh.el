@@ -5,7 +5,7 @@
 ;; Author: USAMI Kenta <tadsan@zonu.me>
 ;; Created: 22 Jan 2016
 ;; Version: 0.0.5
-;; Package-Requires: ((emacs "24.3") (s "1.9.0") (f "0.17"))
+;; Package-Requires: ((emacs "24.3") (s "1.9.0") (f "0.17") (php-runtime "0.2"))
 ;; Keywords: processes php
 ;; URL: https://github.com/zonuexe/psysh.el
 
@@ -84,6 +84,7 @@
 (require 'thingatpt)
 (require 's)
 (require 'f)
+(require 'php-runtime)
 ;; (require 'xdg) ; Emacs 25.3?
 
 
@@ -102,6 +103,24 @@
 (defcustom psysh-inherit-history t
   "If non-nil, inherits PsySH input history."
   :type 'boolean)
+
+(defcustom psysh-doc-install-local-php-manual t
+  "If non-nil, install PHP manual automatically."
+  :type 'boolean)
+
+(defconst psysh-doc-php-manual-language-url-alist
+  '(("English" . "http://psysh.org/manual/en/php_manual.sqlite")
+    ("Brazilian Portuguese" . "http://psysh.org/manual/pt_BR/php_manual.sqlite")
+    ("Chinese (Simplified)" . "http://psysh.org/manual/zh/php_manual.sqlite")
+    ("French" . "http://psysh.org/manual/fr/php_manual.sqlite")
+    ("German" . "http://psysh.org/manual/de/php_manual.sqlite")
+    ("Japanese" . "http://psysh.org/manual/ja/php_manual.sqlite")
+    ("Romanian" . "http://psysh.org/manual/ro/php_manual.sqlite")
+    ("Russian" . "http://psysh.org/manual/ru/php_manual.sqlite")
+    ("Spanish" . "http://psysh.org/manual/es/php_manual.sqlite")
+    ("Turkish" . "http://psysh.org/manual/tr/php_manual.sqlite")))
+
+(defvar psysh-doc--do-not-ask-install-php-manial nil)
 
 ;; PsySH REPL Mode functions
 (defvar psysh-mode-map
@@ -256,6 +275,40 @@ See `psysh-mode-output-syntax-table'."
   "Function to display PsySH doc buffer."
   :type '(function))
 
+(defun psysh-doc--php-manual-user-local-path ()
+  "Return list of path to PHP manual."
+  (if (eq system-type 'windows-nt)
+      (expand-file-name "PsySH/php_manual.sqlite" (getenv "APPDATA"))
+    (expand-file-name "~/.local/share/psysh/php_manual.sqlite")))
+
+(defun psysh-doc--installed-php-manual-path ()
+  "Return non-NIL when PHP manual has been installed."
+  (cl-loop for path in (list (psysh-doc--php-manual-user-local-path)
+                             "/usr/local/share/psysh/php_manual.sqlite")
+           if (file-exists-p path)
+           return (prog1 path
+                    (setq psysh-doc--do-not-ask-install-php-manial t))))
+
+(defun psysh-doc--download-php-manual (url save-path)
+  "Download PHP Manual database by `URL' to `SAVE-PATH'."
+  (let ((dir (file-name-directory save-path)))
+    (unless (file-directory-p dir)
+      (mkdir dir t)))
+  (php-runtime-expr
+   (format "copy(%s, %s)"
+           (php-runtime-quote-string url)
+           (php-runtime-quote-string save-path)))
+  (message "Download complete."))
+
+(defun psysh-doc-install-php-manual (url)
+  "Install PHP Manual database by `URL' to user local directory."
+  (interactive
+   (list (assoc-default
+          (completing-read "Select language of PHP manual: "
+                           psysh-doc-php-manual-language-url-alist)
+          psysh-doc-php-manual-language-url-alist)))
+  (psysh-doc--download-php-manual url (psysh-doc--php-manual-user-local-path)))
+
 ;;;###autoload
 (defun psysh-doc-buffer (target &optional buf)
   "Execute PsySH Doc `TARGET' and Return PsySH buffer `BUF'."
@@ -304,6 +357,11 @@ See `psysh-mode-output-syntax-table'."
           (if (region-active-p)
               (buffer-substring-no-properties (region-beginning) (region-end))
             (thing-at-point 'symbol)))))
+  (when (and psysh-doc-install-local-php-manual
+             (not psysh-doc--do-not-ask-install-php-manial)
+             (null (psysh-doc--installed-php-manual-path))
+             (yes-or-no-p "PHP manual database has not been installed. Download it? "))
+    (call-interactively #'psysh-doc-install-php-manual))
   (funcall psysh-doc-display-function (psysh-doc-buffer target)))
 
 
