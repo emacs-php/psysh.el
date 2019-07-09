@@ -146,7 +146,7 @@ Strings are turned into punctuation so that if they come
 unbalanced they will not break the rest of the buffer.")
 
 (defun psysh--output-filter-remove-syntax (&rest _ignore)
-  "Place the syntax-table property on the psysh output.
+  "Place the `syntax-table' property on the psysh output.
 
 See `psysh-mode-output-syntax-table'."
   (put-text-property (or (point-min)
