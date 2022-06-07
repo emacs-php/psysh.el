@@ -1,13 +1,13 @@
 ;;; psysh.el --- PsySH, PHP interactive shell (REPL) -*- lexical-binding: t -*-
 
-;; Copyright (C) 2018  Friends of Emacs-PHP development
+;; Copyright (C) 2022  Friends of Emacs-PHP development
 
 ;; Author: USAMI Kenta <tadsan@zonu.me>
 ;; Created: 22 Jan 2016
 ;; Version: 0.0.5
 ;; Package-Requires: ((emacs "24.3") (s "1.9.0") (f "0.17") (php-runtime "0.2"))
 ;; Keywords: processes php
-;; URL: https://github.com/zonuexe/psysh.el
+;; URL: https://github.com/emacs-php/psysh.el
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -42,41 +42,6 @@
 ;;
 ;;     $ composer g require psy/psysh:@stable
 ;;
-;;
-;; ### C: Project local REPL
-;;
-;; Set `psysh-comint-buffer-process' (buffer local variable).
-;;
-;;     (setq psysh-comint-buffer-process "path/to/shell.php")
-;;
-;; `shell.php' is for example:
-;;
-;;     #!/usr/bin/env php
-;;     <?php
-;;     // ↓Namespace for your project
-;;     namespace Nyaan;
-;;     
-;;     // load Composer autoload file
-;;     require_once __DIR__ . '/vendor/autoload.php';
-;;     // load other initialize PHP files
-;;     // require_once …
-;;     
-;;     echo __NAMESPACE__ . " shell\n";
-;;     
-;;     $sh = new \Psy\Shell();
-;;     
-;;     // Set project namespace in REPL
-;;     if (defined('__NAMESPACE__') && __NAMESPACE__ !== '') {
-;;         $sh->addCode(sprintf("namespace %s;", __NAMESPACE__));
-;;     }
-;;     
-;;     $sh->run();
-;;     
-;;     // Termination message
-;;     echo "Bye.\n";
-;;
-;; See also https://cho-phper.hateblo.jp/entry/2015/11/10/031000 *(Japanese)*
-;;
 
 ;;; Code:
 (require 'cc-mode)
@@ -89,7 +54,7 @@
 
 
 (defgroup psysh nil
-  "PsySH"
+  "PsySH: PHP interactive shell."
   :tag "PsySH"
   :prefix "psysh-"
   :group 'php
@@ -343,14 +308,14 @@ See `psysh-mode-output-syntax-table'."
 
 ;;;###autoload
 (defun psysh-doc-string (target)
-  "Return string of PsySH Doc `TARGET'."
+  "Return string of PsySH doc TARGET."
   (let ((psysh-doc-buffer-color nil))
     (with-current-buffer (psysh-doc-buffer target (current-buffer))
       (buffer-substring-no-properties (point-min) (point-max)))))
 
 ;;;###autoload
 (defun psysh-doc (target)
-  "Display PsySH doc `TARGET'."
+  "Display PsySH doc TARGET."
   (interactive
    (list (read-string
           "Input class or function name: "
@@ -360,7 +325,7 @@ See `psysh-mode-output-syntax-table'."
   (when (and psysh-doc-install-local-php-manual
              (not psysh-doc--do-not-ask-install-php-manial)
              (null (psysh-doc--installed-php-manual-path))
-             (yes-or-no-p "PHP manual database has not been installed. Download it? "))
+             (yes-or-no-p "PHP manual database has not been installed.  Download it? "))
     (call-interactively #'psysh-doc-install-php-manual))
   (funcall psysh-doc-display-function (psysh-doc-buffer target)))
 
