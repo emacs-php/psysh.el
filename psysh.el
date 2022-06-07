@@ -123,9 +123,8 @@ See `psysh-mode-output-syntax-table'."
   "Major-mode for PsySH REPL."
   :syntax-table psysh-mode-input-syntax-table
   (when (featurep 'php-mode)
-    (set (make-local-variable 'font-lock-defaults)
-         '(php-font-lock-keywords nil nil)))
-  (set (make-local-variable 'parse-sexp-lookup-properties) t)
+    (setq-local font-lock-defaults '(php-font-lock-keywords nil nil)))
+  (setq-local parse-sexp-lookup-properties t)
   (add-hook 'comint-output-filter-functions 'psysh--output-filter-remove-syntax 'append 'local)
   (setq-local comint-process-echoes t)
 
@@ -162,10 +161,9 @@ See `psysh-mode-output-syntax-table'."
         (php-mode)
 
         (when (boundp 'psysh-enable-eldoc)
-          (setq psysh-enable-eldoc (and (boundp 'eldoc-mode) eldoc-mode)))
+          (setq psysh-enable-eldoc (bound-and-true-p eldoc-mode)))
 
-        (if (and (boundp 'auto-complete-mode)
-                 auto-complete-mode
+        (if (and (bound-and-true-p auto-complete-mode)
                  (boundp 'ac-sources))
             (progn
               (setq php-mode-ac-sources ac-sources)
@@ -337,10 +335,10 @@ See `psysh-mode-output-syntax-table'."
   (interactive)
   (switch-to-buffer (psysh--make-process))
 
-  (set (make-local-variable 'psysh-enable-eldoc) nil)
+  (setq-local psysh-enable-eldoc nil)
   (psysh--copy-variables-from-php-mode)
 
-  (when (and (boundp 'psysh-enable-eldoc) psysh-enable-eldoc)
+  (when (bound-and-true-p psysh-enable-eldoc)
     (add-hook 'psysh-mode-hook #'psysh--enable-eldoc))
 
   (psysh-mode)
