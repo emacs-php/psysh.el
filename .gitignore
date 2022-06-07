@@ -1,3 +1,4 @@
+*.elc
 /.cask/
 /composer.lock
 /vendor/
