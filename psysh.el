@@ -4,7 +4,7 @@
 
 ;; Author: USAMI Kenta <tadsan@zonu.me>
 ;; Created: 22 Jan 2016
-;; Version: 0.0.5
+;; Version: 0.1.1
 ;; Package-Requires: ((emacs "24.3") (s "1.9.0") (php-runtime "0.2"))
 ;; Keywords: processes php
 ;; URL: https://github.com/emacs-php/psysh.el
