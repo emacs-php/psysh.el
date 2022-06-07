@@ -5,7 +5,7 @@
 ;; Author: USAMI Kenta <tadsan@zonu.me>
 ;; Created: 22 Jan 2016
 ;; Version: 0.0.5
-;; Package-Requires: ((emacs "24.3") (s "1.9.0") (f "0.17") (php-runtime "0.2"))
+;; Package-Requires: ((emacs "24.3") (s "1.9.0") (php-runtime "0.2"))
 ;; Keywords: processes php
 ;; URL: https://github.com/emacs-php/psysh.el
 
@@ -48,10 +48,9 @@
 (require 'comint)
 (require 'thingatpt)
 (require 's)
-(require 'f)
 (require 'php-runtime)
-;; (require 'xdg) ; Emacs 25.3?
-
+(eval-and-compile
+  (require 'xdg nil t))
 
 (defgroup psysh nil
   "PsySH: PHP interactive shell."
@@ -127,8 +126,8 @@ See `psysh-mode-output-syntax-table'."
   (setq-local parse-sexp-lookup-properties t)
   (add-hook 'comint-output-filter-functions 'psysh--output-filter-remove-syntax 'append 'local)
   (setq-local comint-process-echoes t)
-
-  (let ((history-path (or psysh-history-file-path (f-join (psysh--config-dir-path) "psysh_history"))))
+  (let ((history-path (or psysh-history-file-path
+                          (expand-file-name "psysh_history" (psysh--config-dir-path)))))
     (when (and psysh-inherit-history (file-regular-p history-path))
       (psysh--insertion-history-lines
        (psysh--load-history history-path (ring-size comint-input-ring))))))
@@ -195,12 +194,15 @@ See `psysh-mode-output-syntax-table'."
   "Return path to PsySH config dir."
   ;; TODO: maybe next version Emacs bundles xdg.el?
   (if (eq system-type 'windows-nt)
-      (f-join (s-replace-all '(("\\" . "/"))
-                             (or (getenv "APPDATA")
-                                 (f-join (getenv "HOME") "AppData"))) "PsySH")
-    (f-join (or (getenv "XDG_CONFIG_HOME")
-                (f-join (getenv "HOME") ".config"))
-            "psysh")))
+      (expand-file-name "PsySH"
+                        (s-replace-all '(("\\" . "/"))
+                                       (or (getenv "APPDATA")
+                                           (expand-file-name "AppData" (getenv "HOME")))))
+    (expand-file-name "psysh"
+                      (if (eval-when-compile (fboundp 'xdg-config-home))
+                          (xdg-config-home)
+                        (or (getenv "XDG_CONFIG_HOME")
+                            (expand-file-name "~/.config"))))))
 
 (defun psysh--load-history (path n)
   "Load input history from PATH and return N elements."
