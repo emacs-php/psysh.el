@@ -150,7 +150,8 @@ unbalanced they will not break the rest of the buffer.")
 
 See `psysh-mode-output-syntax-table'."
   (put-text-property (or (point-min)
-                         (previous-single-property-change (point) 'field)) (point)
+                         (previous-single-property-change (point) 'field))
+                     (point)
                      'syntax-table psysh-mode-output-syntax-table))
 
 (define-derived-mode psysh-mode comint-mode "PsySH"
@@ -225,7 +226,6 @@ See `psysh-mode-output-syntax-table'."
   (when (eq major-mode 'psysh-mode)
     (delete-process (get-buffer-process (current-buffer)))
     (psysh)))
-
 
 ;; History
 (defun psysh--config-dir-path ()
@@ -363,7 +363,6 @@ See `psysh-mode-output-syntax-table'."
              (yes-or-no-p "PHP manual database has not been installed. Download it? "))
     (call-interactively #'psysh-doc-install-php-manual))
   (funcall psysh-doc-display-function (psysh-doc-buffer target)))
-
 
 ;; PsySH Command
 
