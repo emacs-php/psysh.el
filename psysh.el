@@ -275,30 +275,30 @@ See `psysh-mode-output-syntax-table'."
   (psysh-doc--download-php-manual url (psysh-doc--php-manual-user-local-path)))
 
 ;;;###autoload
-(defun psysh-doc-buffer (target &optional buf)
-  "Execute PsySH Doc `TARGET' and Return PsySH buffer `BUF'."
-  (if (null buf) (setq buf (get-buffer-create psysh-doc-buffer-name)))
-  (with-current-buffer buf
-    (read-only-mode -1)
-    (erase-buffer)
-    (insert "doc " target)
-    (message "%s %s" (nth 1 (psysh--detect-buffer)) (buffer-substring (point-min) (point-max)))
-    (apply 'call-process-region (point-min) (point-max) (nth 1 (psysh--detect-buffer)) t t nil
-           (if (memq psysh-doc-buffer-color '(none only-emacs))
-               '("--no-color")
-             '("--color")))
-    (unless (memq psysh-doc-buffer-color '(none only-emacs))
-      (ansi-color-apply-on-region (point-min) (point-max)))
-    (goto-char (point-min))
-    (when (search-forward-regexp psysh--re-prompt nil t)
-      (delete-region (point-min) (match-beginning 0)))
-    (goto-char (point-max))
-    (when (search-backward-regexp (concat psysh--re-prompt "$") nil t)
-      (delete-region (match-beginning 0) (point-max)))
-    (goto-char (point-min))
-    (unless (eq major-mode 'psysh-doc-mode)
-      (psysh-doc-mode)))
-  buf)
+(defun psysh-doc-buffer (target &optional buffer)
+  "Execute PsySH Doc TARGET and Return PsySH BUFFER."
+  (unless buffer
+    (setq buffer (get-buffer-create psysh-doc-buffer-name)))
+  (with-current-buffer buffer
+    (psysh-doc-mode)
+    (let ((buffer-read-only nil))
+      (erase-buffer)
+      (insert "doc " target)
+      (message "%s %s" (nth 1 (psysh--detect-buffer)) (buffer-substring (point-min) (point-max)))
+      (apply #'call-process-region (point-min) (point-max) (nth 1 (psysh--detect-buffer)) t t nil
+             (if (memq psysh-doc-buffer-color '(none only-emacs))
+                 '("--no-color")
+               '("--color")))
+      (unless (memq psysh-doc-buffer-color '(none only-emacs))
+        (ansi-color-apply-on-region (point-min) (point-max)))
+      (goto-char (point-min))
+      (when (search-forward-regexp psysh--re-prompt nil t)
+        (delete-region (point-min) (match-beginning 0)))
+      (goto-char (point-max))
+      (when (search-backward-regexp (concat psysh--re-prompt "$") nil t)
+        (delete-region (match-beginning 0) (point-max)))
+      (goto-char (point-min))))
+  buffer)
 
 ;;;###autoload
 (define-derived-mode psysh-doc-mode prog-mode "PsySH-doc"
