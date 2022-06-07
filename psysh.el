@@ -219,7 +219,7 @@ See `psysh-mode-output-syntax-table'."
               do (forward-line -1)))))
 
 (defun psysh--insertion-history-lines (history)
-  "Insert `HISTORY' lines to `comint-input-ring'."
+  "Insert HISTORY lines to `comint-input-ring'."
   (cl-loop for line in history
            unless (string= "" line)
            do (comint-add-to-input-history line)))
@@ -255,7 +255,7 @@ See `psysh-mode-output-syntax-table'."
                     (setq psysh-doc--do-not-ask-install-php-manial t))))
 
 (defun psysh-doc--download-php-manual (url save-path)
-  "Download PHP Manual database by `URL' to `SAVE-PATH'."
+  "Download PHP Manual database by URL to SAVE-PATH."
   (let ((dir (file-name-directory save-path)))
     (unless (file-directory-p dir)
       (mkdir dir t)))
@@ -266,7 +266,7 @@ See `psysh-mode-output-syntax-table'."
   (message "Download complete."))
 
 (defun psysh-doc-install-php-manual (url)
-  "Install PHP Manual database by `URL' to user local directory."
+  "Install PHP Manual database by URL to user local directory."
   (interactive
    (list (assoc-default
           (completing-read "Select language of PHP manual: "
@@ -349,7 +349,7 @@ See `psysh-mode-output-syntax-table'."
 
 ;;;###autoload
 (defun psysh-run (buffer-name process)
-  "Run PsySH interactive-shell in `BUFFER-NAME' and `PROCESS'."
+  "Run PsySH interactive-shell in BUFFER-NAME and PROCESS."
   (let ((psysh-comint-buffer-process (list buffer-name process)))
     (call-interactively 'psysh)))
 
