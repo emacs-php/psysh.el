@@ -188,7 +188,7 @@ See `psysh-mode-output-syntax-table'."
   (interactive)
   (when (eq major-mode 'psysh-mode)
     (delete-process (get-buffer-process (current-buffer)))
-    (psysh)))
+    (call-interactively 'psysh)))
 
 ;; History
 (defun psysh--config-dir-path ()
