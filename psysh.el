@@ -230,11 +230,11 @@ See `psysh-mode-output-syntax-table'."
 
 (defcustom psysh-doc-buffer-color 'auto
   "Coloring PsySH buffer."
-  :type '(choice (const :tag "Auto detect color mode." 'auto)
-                 (const :tag "Use only PsySH original coloring." 'only-psysh)
-                 (const :tag "Use only Emacs font-lock coloring." 'only-emacs)
-                 (const :tag "Use multiple coloring mechanism." 'mixed)
-                 (const :tag "No coloring." 'none)))
+  :type '(choice (const :tag "Auto detect color mode." auto)
+                 (const :tag "Use only PsySH original coloring." only-psysh)
+                 (const :tag "Use only Emacs font-lock coloring." only-emacs)
+                 (const :tag "Use multiple coloring mechanism." mixed)
+                 (const :tag "No coloring." none)))
 
 (defcustom psysh-doc-display-function #'view-buffer-other-window
   "Function to display PsySH doc buffer."
