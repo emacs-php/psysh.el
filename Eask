@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "psysh"
          "0.1.1"
          "PsySH, PHP interactive shell (REPL)")
